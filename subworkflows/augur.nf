@@ -5,6 +5,56 @@
 //Authors of this Nextflow: Abigail Shockey
 //Email: abigail.shockey@slh.wisc.edu
 
+include { AUGUR_FILTER      } from '../modules/local/augur_filter'
+include { AUGUR_ALIGN       } from '../modules/local/augur_align'
+include { AUGUR_TREE        } from '../modules/local/augur_tree'
+include { AUGUR_REFINE      } from '../modules/local/augur_refine'
+include { AUGUR_ANCESTRAL   } from '../modules/local/augur_ancestral'
+include { AUGUR_TRANSLATE   } from '../modules/local/augur_translate'
+include { AUGUR_TRAITS      } from '../modules/local/augur_traits'
+include { AUGUR_EXPORT      } from '../modules/local/augur_export'
+
+workflow AUGUR {
+  take:
+  reference
+  metadata
+  colors
+  lat_long
+  sequences
+
+
+
+  main:
+
+  ch_versions = Channel.empty()
+
+  AUGUR_FILTER
+
+  AUGUR_ALIGN
+
+  AUGUR_TREE
+
+  AUGUR_REFINE
+
+  AUGUR_ANCESTRAL
+
+  AUGUR_TRANSLATE
+
+  AUGUR_TRAITS
+
+  AUGUR_EXPORT
+
+
+  emit:
+
+
+
+  versions = ch_versions 
+
+
+
+}
+
 // Input channels
 
 Channel
