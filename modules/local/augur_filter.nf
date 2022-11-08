@@ -1,18 +1,19 @@
-process filter{
-    publishDir "${params.outdir}/filter", mode:'copy'
+process AUGUR_FILTER {
+
+    container = 'staphb/augur:16.0.3'
 
     input:
-    file(fasta) from sequences
-    file(metadata) from filter_metadata
-    file(exclude) from dropped_strains
+    file(multifasta)
+    file(metadata)
+    file(exclude)
 
     output:
-    file "filtered.fasta" into input_sequences
+    file "filtered.fasta", emit: filtered_fasta
 
     shell:
     """
     augur filter \
-    --sequences ${fasta} \
+    --sequences ${multifasta} \
     --metadata ${metadata} \
     --exclude ${exclude} \
     --output filtered.fasta \

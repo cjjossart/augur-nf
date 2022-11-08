@@ -16,40 +16,44 @@ include { AUGUR_EXPORT      } from '../modules/local/augur_export'
 
 workflow AUGUR {
   take:
+  multifasta
   reference
   metadata
   colors
   lat_long
-  sequences
-
-
-
+  
   main:
 
   ch_versions = Channel.empty()
+  ch_multifasta = file(params.multifasta)
+  ch_reference = file(params.reference)
+  ch_metadata = file(metadata)
+  ch_colors = file(colors)
+  ch_lat_long = file(lat_long)
+  ch_exclude = file(params.exclude)
+  ch_bed = file(params.bed)
 
-  AUGUR_FILTER
+  AUGUR_FILTER( ch_multifasta, ch_metadata, ch_exclude )
 
-  AUGUR_ALIGN
+  AUGUR_ALIGN( AUGUR_FILTER.out.filtered_fasta, ch_reference, ch_bed )
 
-  AUGUR_TREE
+  AUGUR_TREE( AUGUR_ALIGN.out.alignment )
 
-  AUGUR_REFINE
+  AUGUR_REFINE( AUGUR_TREE.out.raw_tree, AUGUR_ALIGN.out.alignment, ch_metadata )
 
-  AUGUR_ANCESTRAL
+  AUGUR_ANCESTRAL( AUGUR_REFINE.out.refined_tree, AUGUR_ALIGN.out.alignment ) 
 
-  AUGUR_TRANSLATE
+  AUGUR_TRANSLATE( AUGUR_REFINE.out.refined_tree, AUGUR_ANCESTRAL.out.ancestral_aa, ch_reference )
 
-  AUGUR_TRAITS
+  AUGUR_TRAITS( AUGUR_REFINE.out.traits, ch_metadata )
 
-  AUGUR_EXPORT
+  AUGUR_EXPORT( AUGUR_REFINE.out.refined_tree, ch_metadata, AUGUR_REFINE.out.branch_lengths, AUGUR_ANCESTRAL.out.ancestral_nt, AUGUR_TRANSLATE.out.ancestral_aa, ch_colors, ch_lat_long, ch_config )
 
 
   emit:
 
-
-
-  versions = ch_versions 
+  versions = ch_versions
+  auspice_json = AUGUR_EXPORT.out.
 
 
 
